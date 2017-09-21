@@ -3,10 +3,85 @@
 <head>
   <title>Our simple HTTP server</title>
   <link rel="stylesheet" type="text/css" href="/style.css">
-  
   <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.8.34/browser.min.js"></script>
-  <script type="text/babel">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+  <script type="text/javascript">
+	//by Alec Bielanos, please don't steal my things
+	 
+	'use strict';
 
+	//IIFE Begins here - Globals need not apply!
+	(function(){
+
+		//init event listeners
+		function init() {
+			document.querySelector("#send").onclick = sendAjax;
+		}
+	  
+		//sends request
+		function sendAjax(e) {
+			
+			//get data from the forms
+			var pageObj = document.querySelector('#page');
+			var typeObj = document.querySelector('#type');
+			var page = pageObj.options[pageObj.selectedIndex].value;
+			var type = typeObj.options[typeObj.selectedIndex].value;
+
+			//open a GET request and prevent default
+			$.ajax({
+			headers: {
+				Accept: type + "; charset=utf-8",
+				"Content-Type": type + "; charset=utf-8;"
+			},
+			type: "GET",
+			data: null,
+			url: page,
+			success: printSuccess,
+			error: function(xhr, options, err){ printMessage(err, xhr.responseText); }
+		});
+
+		e.preventDefault();
+		return false;
+		}
+		
+		//prints a successful response
+		function printSuccess(){
+			var title = document.createElement('h1');
+			title.textContent = 'Success';
+			var message = document.createElement('p');
+			message.textContent = 'This is a successful response.';
+			
+			//clear and push new stuff to content section
+			document.querySelector('#content').innerHTML = "";
+			document.querySelector('#content').appendChild(title).appendChild(message);	
+		}
+		
+		//print some data to the HTML
+		//accepts: textual portion of Status Code & Verbose Message Returned
+		function printMessage(code, msg){
+			console.log(code);
+			console.log(msg);
+			console.dir(type);
+			
+			var msgObj = JSON.parse(msg);
+			
+			console.dir(msgObj);
+			
+			var title = document.createElement('h1');
+			title.textContent = code;
+			var message = document.createElement('p');
+			message.textContent = msgObj.message;
+			
+			//clear and push new stuff to content section
+			document.querySelector('#content').innerHTML = "";
+			document.querySelector('#content').appendChild(title).appendChild(message);	
+		}
+	  
+		//calls init once the window has loaded
+		window.addEventListener("load",init);
+		
+		//end of IIFE
+	  })();
   </script>
 </head>
 <body>
